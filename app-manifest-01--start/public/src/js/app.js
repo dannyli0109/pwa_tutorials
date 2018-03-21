@@ -24,13 +24,6 @@ window.addEventListener('beforeinstallprompt', event => {
     return false;
 })
 
-// var promise = new Promise((resolve, reject) => {
-//     setTimeout(function() {
-//         // resolve('This is executed once the timer is done!')
-//         reject({code: 500, message: "An error occurred!"})
-//     }, 3000)
-// });
-
 fetch('https://httpbin.org/ip')
     .then(res => {
         console.log(res)
@@ -63,18 +56,3 @@ fetch('https://httpbin.org/post', {
     .catch(err => {
         console.log(err)
     })
-
-// promise.then((text) => {
-//     return text
-// }, err => {
-//     console.log(err.code, err.message)
-// }).then((newText) => {
-//     console.log(newText)
-// })
-// promise.then((text) => {
-//     return text
-// }).then((newText) => {
-//     console.log(newText)
-// }).catch(err => {
-//     console.log(err.code, err.message)
-// })
