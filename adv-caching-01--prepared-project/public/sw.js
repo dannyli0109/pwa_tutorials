@@ -1,6 +1,6 @@
 
-var CACHE_STATIC_NAME = 'static-v12';
-var CACHE_DYNAMIC_NAME = 'dynamic-v2';
+var CACHE_STATIC_NAME = 'static-v14';
+var CACHE_DYNAMIC_NAME = 'dynamic-v3';
 var STATIC_FILES = [
   '/',
   '/index.html',
@@ -29,6 +29,19 @@ self.addEventListener('install', function(event) {
   )
 });
 
+// function trimCache(cacheName, maxItems) {
+//   caches.open(cacheName)
+//     .then(cache => {
+//       return cache.keys()
+//         .then(keys => {
+//           if (keys.length > maxItems) {
+//             cache.delete(keys[0])
+//               .then(trimCache(cacheName, maxItems))
+//           }
+//         })
+//     })
+// }
+
 self.addEventListener('activate', function(event) {
   console.log('[Service Worker] Activating Service Worker ....', event);
   event.waitUntil(
@@ -45,8 +58,18 @@ self.addEventListener('activate', function(event) {
   return self.clients.claim();
 });
 
+
+function isInArray(string, array) {
+  array.forEach(element => {
+    if (element == string) {
+      return true
+    }
+  })
+  return false
+}
+
 self.addEventListener('fetch', function(event) {
-  let url = 'https://httpbin.org/get'
+  let url = 'https://httpbin.org/post'
 
   if (event.request.url.indexOf(url) > -1) {
     event.respondWith(
@@ -54,12 +77,13 @@ self.addEventListener('fetch', function(event) {
         .then(cache => {
           return fetch(event.request)
             .then(res => {
+              // trimCache(CACHE_DYNAMIC_NAME, 3)
               cache.put(event.request, res.clone())
               return res
             })
         })
     );
-  } else if (new RegExp('\\b' + STATIC_FILES.join('\\b|\\b')).test(event.request.url)) {
+  } else if (isInArray(event.request.url, STATIC_FILES)) {
       event.respondWith(
         caches.match(event.request)
       )
@@ -74,6 +98,7 @@ self.addEventListener('fetch', function(event) {
               .then(function(res) {
                 return caches.open(CACHE_DYNAMIC_NAME)
                   .then(function(cache) {
+                    // trimCache(CACHE_DYNAMIC_NAME, 3)                    
                     cache.put(event.request.url, res.clone());
                     return res;
                   })
@@ -81,7 +106,7 @@ self.addEventListener('fetch', function(event) {
               .catch(function(err) {
                 return caches.open(CACHE_STATIC_NAME)
                   .then(cache => {
-                    if (event.request.url.indexOf('/help')) {
+                    if (event.request.headers.get('accept').includes('text/html')) {
                       return cache.match('/offline.html')                      
                     } 
                   })

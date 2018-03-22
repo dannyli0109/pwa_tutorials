@@ -36,6 +36,15 @@ self.addEventListener('activate', function(event) {
   
 });
 
+
+function isInArray(string, array) {
+  array.forEach(element => {
+    if (element == string) {
+      return true
+    }
+  })
+  return false
+}
 // self.addEventListener('fetch', function(event) {
 //   event.respondWith(
 //     caches.match(event.request)
@@ -102,7 +111,11 @@ self.addEventListener('fetch', function(event) {
             })
         })
     );
-  } 
+  } else if (isInArray(event.request.url, STATIC_FILE_PATH)) {
+    event.respondWith(
+      caches.match(event.request)
+    )
+  }
   else {
     event.respondWith(
       caches.match(event.request)
