@@ -1,8 +1,7 @@
+importScripts('/src/js/idb.js');
+importScripts('/src/js/utility.js');
 
-importScripts('/src/js/idb.js')
-importScripts('/src/js/utility.js')
-
-var CACHE_STATIC_NAME = 'static-v18';
+var CACHE_STATIC_NAME = 'static-v22';
 var CACHE_DYNAMIC_NAME = 'dynamic-v2';
 var STATIC_FILES = [
   '/',
@@ -10,8 +9,8 @@ var STATIC_FILES = [
   '/offline.html',
   '/src/js/app.js',
   '/src/js/feed.js',
-  '/src/js/promise.js',
   '/src/js/idb.js',
+  '/src/js/promise.js',
   '/src/js/fetch.js',
   '/src/js/material.min.js',
   '/src/css/app.css',
@@ -21,7 +20,6 @@ var STATIC_FILES = [
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
 ];
-
 
 // function trimCache(cacheName, maxItems) {
 //   caches.open(cacheName)
@@ -73,26 +71,25 @@ function isInArray(string, array) {
   }
   return array.indexOf(cachePath) > -1;
 }
+
 self.addEventListener('fetch', function (event) {
 
-  var url = 'https://pwagram-9de82.firebaseio.com/posts.json';
+  var url = 'https://pwagram-9de82.firebaseio.com/posts';
   if (event.request.url.indexOf(url) > -1) {
-    event.respondWith(
-      fetch(event.request)
-        .then(res => {
-          let clonedRes = res.clone()
-          // clear store before populating
-          clearAllData('posts')
-            .then(() => {
-              return clonedRes.json()
-            })
-            .then(data => {
-              for (var key in data) {
-                writeData('posts', data[key])
-              }
-            })
-            return res
-        })
+    event.respondWith(fetch(event.request)
+      .then(function (res) {
+        var clonedRes = res.clone();
+        clearAllData('posts')
+          .then(function () {
+            return clonedRes.json();
+          })
+          .then(function (data) {
+            for (var key in data) {
+              writeData('posts', data[key])
+            }
+          });
+        return res;
+      })
     );
   } else if (isInArray(event.request.url, STATIC_FILES)) {
     event.respondWith(
