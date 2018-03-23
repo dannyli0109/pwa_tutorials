@@ -190,7 +190,7 @@ self.addEventListener('sync', event => {
       readAllData('sync-posts')
         .then(data => {
           for (let dt of data) {
-            fetch('https://pwagram-9de82.firebaseio.com/posts.json', {
+            fetch('https://us-central1-pwagram-9de82.cloudfunctions.net/storePostData', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
